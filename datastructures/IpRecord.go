@@ -11,7 +11,7 @@ type IpRecord struct {
 }
 
 func (ipRecord *IpRecord) Create() {
-	db, err := db.Init()
+	db, err := db.Init("the conn string")
 	if err != nil {
 		return
 	}
