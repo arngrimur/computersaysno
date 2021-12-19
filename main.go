@@ -7,10 +7,12 @@ import (
 )
 
 func main() {
+
 	http.HandleFunc("/info", RESTendpoints.Info)
 	http.HandleFunc("/", RESTendpoints.Welcome)
 	err := http.ListenAndServe(":443", nil)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal("Unable to start web server!", err)
+		return
 	}
 }

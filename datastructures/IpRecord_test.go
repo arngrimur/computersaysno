@@ -47,4 +47,3 @@ func TestIpRecord_GetHitCount(t *testing.T) {
 	assert.Equal(t, uint8(2), record.GetHitCount())
 }
 
-
