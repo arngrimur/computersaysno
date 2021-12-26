@@ -47,9 +47,9 @@ func SetuMySql(rootPassword string, mysqlUser string, mysqlPwd string) (*string,
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	connectionsString := fmt.Sprintf(mysqlUser+":"+mysqlPwd+"@(localhost:%s)/csn_db?parseTime=true", resource.GetPort("3306/tcp"))
 	log.Printf("Connections string: %s", connectionsString)
-	resource.Expire(120) // Tell docker to hard kill the container
+	resource.Expire(60) // Tell docker to hard kill the container
 
-	pool.MaxWait = 120 * time.Second
+	pool.MaxWait = 60 * time.Second
 	if err = pool.Retry(func() error {
 		db, err = sql.Open("mysql", connectionsString)
 		if err != nil {
