@@ -1,7 +1,6 @@
 package models
 
 import (
-	"csn/csn_tests_helper"
 	"csn/db"
 	"database/sql"
 	"github.com/ory/dockertest/v3"
@@ -21,14 +20,14 @@ var lookFor = IpRecord{
 }
 
 func TestMain(m *testing.M) {
-	connString, pool, resource = csn_tests_helper.SetuMySql()
+	connString, pool, resource = db.SetuMySql("secret", "testuser", "testpassword")
 	var err error
 	sqlDb, err = db.Init(*connString)
 	if err != nil {
 		return
 	}
 	exitVal := m.Run()
-	csn_tests_helper.Purge(pool, resource)
+	db.Purge(pool, resource)
 	os.Exit(exitVal)
 }
 

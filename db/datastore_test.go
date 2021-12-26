@@ -1,14 +1,16 @@
 package db
 
 import (
-	"csn/csn_tests_helper"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestInit(t *testing.T) {
-	connectionString, pool, resource := csn_tests_helper.SetuMySql()
-	defer csn_tests_helper.Purge(pool, resource)
+	connectionString, pool, resource := SetuMySql("secret","testuser", "testpassword")
+	port := resource.GetPort("3306")
+	assert.Equal(t, "testuser:testpassword@(localhost:"+port+")/csn_db?parseTime=true", connectionString)
+	defer Purge(pool, resource)
 	db, initErr := Init(*connectionString)
 	require.NoError(t, initErr, "Could not init the database")
 	dbErr := db.Ping()

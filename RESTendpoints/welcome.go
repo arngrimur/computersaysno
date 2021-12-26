@@ -20,15 +20,26 @@ func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ip = r.RemoteAddr
 	}
-	ipEntry, ipEntryExist := lookUpMap[ip]
-	if ipEntryExist {
-		ipEntry.IncreaseHitCount()
-		generateOutput(w, ipEntry)
+	//ipEntry, ipEntryExist := lookUpMap[ip]
+	findIpRecord := models.NewIpRecord(ip)
+	readIpRecord, err := findIpRecord.Read(welcome.DB)
+	if err != nil {
+		findIpRecord.Create(welcome.DB)
+		generateOutput(w,findIpRecord)
 	} else {
-		lookUpMap[ip] = models.NewIpRecord(ip)
-		//save(lookUpMap[ip])
-		generateOutput(w, lookUpMap[ip])
+		readIpRecord.IncreaseHitCount()
+		readIpRecord.Update(welcome.DB)
+		generateOutput(w,readIpRecord)
 	}
+
+	//if ipEntryExist {
+	//	ipEntry.IncreaseHitCount()
+	//	generateOutput(w, ipEntry)
+	//} else {
+	//	lookUpMap[ip] = models.NewIpRecord(ip)
+	//	//save(lookUpMap[ip])
+	//	generateOutput(w, lookUpMap[ip])
+	//}
 }
 
 func generateOutput(w http.ResponseWriter, entry *models.IpRecord) {

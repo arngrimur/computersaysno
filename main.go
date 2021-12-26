@@ -12,14 +12,15 @@ type environment struct {
 }
 
 func main() {
-	db, dbErr := db.Init("testuser:testpassword@(localhost:3306)/csn_db")
-	if dbErr != nil {
+	connString, pool, resource := db.SetuMySql("secret", "testuser", "testpassword")
+	defer db.Purge(pool,resource)
+	database, connectionError := db.Init(*connString)
+	if connectionError != nil {
 		return
 	}
-	defer db.Close()
 
 	env := &environment{welcome: RESTendpoints.WelcomeModel{
-		DB: db,
+		DB: database,
 	}}
 
 	http.HandleFunc("/info", RESTendpoints.Info)

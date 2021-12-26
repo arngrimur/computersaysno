@@ -3,10 +3,8 @@ module csn
 go 1.17
 
 require (
-	github.com/go-sql-driver/mysql v1.6.0
 	github.com/ory/dockertest/v3 v3.8.1
 	github.com/stretchr/testify v1.7.0
-	gotest.tools/v3 v3.0.3
 )
 
 require (
@@ -21,7 +19,6 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
