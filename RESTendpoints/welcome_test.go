@@ -18,10 +18,10 @@ func TestWelcome(t *testing.T) {
 		args args
 	}{
 		{"First time is ok", args{get_request(t, "GET", "/", "127.0.0.1"), Welcome, http.StatusOK}},
-		{"Second time is ok", args{get_request(t, "GET", "/","127.0.0.1"), Welcome, http.StatusOK}},
-		{"Third time is forbidden", args{ get_request(t, "GET", "/","127.0.0.1"), Welcome, http.StatusForbidden}},
-		{"Keep rejecting", args{get_request(t, "GET", "/","127.0.0.1"), Welcome, http.StatusForbidden}},
-		{"New IP is alllowed", args{get_request(t, "GET", "/","10.0.0.10"), Welcome, http.StatusOK}},
+		{"Second time is ok", args{get_request(t, "GET", "/", "127.0.0.1"), Welcome, http.StatusOK}},
+		{"Third time is forbidden", args{get_request(t, "GET", "/", "127.0.0.1"), Welcome, http.StatusForbidden}},
+		{"Keep rejecting", args{get_request(t, "GET", "/", "127.0.0.1"), Welcome, http.StatusForbidden}},
+		{"New IP is alllowed", args{get_request(t, "GET", "/", "10.0.0.10"), Welcome, http.StatusOK}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -38,7 +38,6 @@ func get_request(t *testing.T, method string, url string, ip string) *http.Reque
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.RemoteAddr = ip+":443"
+	req.RemoteAddr = ip + ":443"
 	return req
 }
-

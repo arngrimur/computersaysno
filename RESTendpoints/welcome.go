@@ -1,15 +1,20 @@
 package RESTendpoints
 
 import (
-	"datastructures"
+	"csn/models"
+	"database/sql"
 	"fmt"
 	"net"
 	"net/http"
 )
 
-var lookUpMap = make(map[string]*datastructures.IpRecord)
+type WelcomeModel struct {
+	DB *sql.DB
+}
 
-func Welcome(w http.ResponseWriter, r *http.Request) {
+var lookUpMap = make(map[string]*models.IpRecord)
+
+func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
@@ -20,13 +25,13 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 		ipEntry.IncreaseHitCount()
 		generateOutput(w, ipEntry)
 	} else {
-		lookUpMap[ip] = datastructures.NewIpRecord(ip)
+		lookUpMap[ip] = models.NewIpRecord(ip)
 		//save(lookUpMap[ip])
-		generateOutput(w,lookUpMap[ip])
+		generateOutput(w, lookUpMap[ip])
 	}
 }
 
-func generateOutput(w http.ResponseWriter, entry *datastructures.IpRecord) {
+func generateOutput(w http.ResponseWriter, entry *models.IpRecord) {
 	switch entry.GetHitCount() {
 	case uint8(1):
 		w.WriteHeader(http.StatusOK)
@@ -42,5 +47,3 @@ func generateOutput(w http.ResponseWriter, entry *datastructures.IpRecord) {
 		break
 	}
 }
-
-
