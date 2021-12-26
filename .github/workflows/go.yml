@@ -19,6 +19,7 @@ jobs:
         password: ${{ secrets.HUB_DOCKER_TOKEN }}
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         ecr: false
+        logout: false
 
     - name: Set up Go
       uses: actions/setup-go@v2
