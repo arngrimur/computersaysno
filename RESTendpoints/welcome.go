@@ -12,7 +12,7 @@ type WelcomeModel struct {
 	DB *sql.DB
 }
 
-var lookUpMap = make(map[string]*models.IpRecord)
+//var lookUpMap = make(map[string]*models.IpRecord)
 
 func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
@@ -25,11 +25,11 @@ func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 	readIpRecord, err := findIpRecord.Read(welcome.DB)
 	if err != nil {
 		findIpRecord.Create(welcome.DB)
-		generateOutput(w,findIpRecord)
+		generateOutput(w, findIpRecord)
 	} else {
 		readIpRecord.IncreaseHitCount()
 		readIpRecord.Update(welcome.DB)
-		generateOutput(w,readIpRecord)
+		generateOutput(w, readIpRecord)
 	}
 
 	//if ipEntryExist {

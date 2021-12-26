@@ -11,16 +11,29 @@ import (
 )
 
 const ip = "1.1.1.1"
+
 var connString *string
 var pool *dockertest.Pool
 var resource *dockertest.Resource
 var sqlDb *sql.DB
 var lookFor = IpRecord{
-	ip:       ip,
+	ip: ip,
 }
 
 func TestMain(m *testing.M) {
-	connString, pool, resource = db.SetuMySql("secret", "testuser", "testpassword")
+	var testDbConfig = db.DbConfig{
+		DbSecrets: db.DbSecrets{
+			RootPassword: "secret",
+			MysqlUser:    "testuser",
+			MysqlPwd:     "testpassword",
+		},
+		HostConfig: db.HostConfig{
+			AutoRemove:    true,
+			RestartPolicy: "no",
+		},
+		ExpireTime: uint(240),
+	}
+	connString, pool, resource = db.SetuMySql(testDbConfig)
 	var err error
 	sqlDb, err = db.Init(*connString)
 	if err != nil {
@@ -93,12 +106,12 @@ func TestIpRecord_Read(t *testing.T) {
 func TestIpRecord_Update(t *testing.T) {
 	recordRead, _ := lookFor.Read(sqlDb)
 	recordRead.IncreaseHitCount()
- 	result, err := recordRead.Update(sqlDb)
+	result, err := recordRead.Update(sqlDb)
 	require.NoError(t, err, "Failed to update record in database")
 	affected, err := result.RowsAffected()
 	require.NoError(t, err, "No affected rows")
-	assert.Equal(t, int64(1),affected)
-	recordRead, _ =lookFor.Read(sqlDb)
+	assert.Equal(t, int64(1), affected)
+	recordRead, _ = lookFor.Read(sqlDb)
 	assert.Equal(t, ip, recordRead.ip)
 	assert.Equal(t, uint8(2), recordRead.hitCount)
 }
@@ -108,6 +121,6 @@ func TestIpRecord_Delete(t *testing.T) {
 	require.NoError(t, err, "Could no delete record")
 	assert.Equal(t, ip, record.ip)
 	assert.Equal(t, uint8(2), record.hitCount)
-	_ , err2 := lookFor.Read(sqlDb)
+	_, err2 := lookFor.Read(sqlDb)
 	require.Error(t, err2, "No IpRecord shall exist!")
 }

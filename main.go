@@ -12,7 +12,18 @@ type environment struct {
 }
 
 func main() {
-	connString, pool, resource := db.SetuMySql("secret", "testuser", "testpassword")
+	dbConfig := db.DbConfig{
+		DbSecrets: db.DbSecrets{
+			RootPassword: "secret",
+			MysqlUser:    "testuser",
+			MysqlPwd:     "testpassword",
+		},
+		HostConfig: db.HostConfig{
+			AutoRemove:    false,
+			RestartPolicy: "always",
+		},
+	}
+	connString, pool, resource := db.SetuMySql(dbConfig)
 	defer db.Purge(pool,resource)
 	database, connectionError := db.Init(*connString)
 	if connectionError != nil {
