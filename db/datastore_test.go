@@ -14,17 +14,18 @@ func TestInit(t *testing.T) {
 			MysqlPwd:     "testpassword",
 		},
 		HostConfig: HostConfig{
-			AutoRemove:    true,
+			AutoRemove:    false,
 			RestartPolicy: "no",
 		},
-		ExpireTime: uint(240),
+		ExpireTime:   uint(240),
+		DatabaseName: "csn_db",
 	}
-	connectionString, pool, resource := SetuMySql(testDbConfig)
+	connectionString, pool, resource := SetupDatbase(testDbConfig)
 
 	port := resource.GetPort("3306/tcp")
-	assert.Equal(t, "testuser:testpassword@(localhost:"+port+")/csn_db?parseTime=true", *connectionString)
+	assert.Equal(t, "testuser:testpassword@(localhost:"+port+")/"+testDbConfig.DatabaseName+"?parseTime=true", *connectionString)
 	defer Purge(pool, resource)
-	db, initErr := Init(*connectionString)
+	db, initErr := InitDatabase(*connectionString)
 	require.NoError(t, initErr, "Could not init the database")
 	dbErr := db.Ping()
 	require.NoError(t, dbErr, "Failed to ping database")

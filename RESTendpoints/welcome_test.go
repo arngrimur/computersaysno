@@ -27,9 +27,9 @@ func TestWelcome(t *testing.T) {
 		},
 		ExpireTime: uint(240),
 	}
-	var connString, pool, resource = db.SetuMySql(testDbConfig)
+	var connString, pool, resource = db.SetupDatbase(testDbConfig)
 	defer db.Purge(pool, resource)
-	var sqlDb, err = db.Init(*connString)
+	var sqlDb, err = db.InitDatabase(*connString)
 	require.NoError(t, err, "Could not set up database")
 
 	tests := []struct {

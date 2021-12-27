@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -29,14 +30,15 @@ type HostConfig struct {
 }
 
 type DbConfig struct {
-	DbSecrets  DbSecrets
-	HostConfig HostConfig
-	ExpireTime uint
+	DbSecrets    DbSecrets
+	HostConfig   HostConfig
+	ExpireTime   uint
+	DatabaseName string
 }
 
 var db *sql.DB
 
-func SetuMySql(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Resource) {
+func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Resource) {
 	pool, err := dockertest.NewPool("")
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	// pulls an image, creates a container based on it and runs it
@@ -44,14 +46,17 @@ func SetuMySql(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Resour
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
+	wd, _ := os.Getwd()
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "arngrimur/computersaysno_db",
-		Tag:        "0.0.1",
+		Repository: "mysql",
+		Tag:        "8.0.27",
 		Env: []string{
 			"MYSQL_ROOT_PASSWORD=" + dbConfig.DbSecrets.RootPassword,
 			"MYSQL_USER=" + dbConfig.DbSecrets.MysqlUser,
 			"MYSQL_PASSWORD=" + dbConfig.DbSecrets.MysqlPwd,
+			"MYSQL_DATABASE=" + dbConfig.DatabaseName,
 		},
+		Mounts: []string{wd + "/mounts:/docker-entrypoint-initdb.d"},
 		// set AutoRemove to true so that stopped container goes away by itself
 	}, func(config *docker.HostConfig) {
 		config.AutoRemove = dbConfig.HostConfig.AutoRemove
@@ -84,7 +89,7 @@ func Purge(pool *dockertest.Pool, resource *dockertest.Resource) {
 	}
 }
 
-func Init(connectionString string) (*sql.DB, error) {
+func InitDatabase(connectionString string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", connectionString)
 	db.SetMaxIdleConns(0)
 	if err != nil {

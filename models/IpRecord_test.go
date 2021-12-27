@@ -33,9 +33,9 @@ func TestMain(m *testing.M) {
 		},
 		ExpireTime: uint(240),
 	}
-	connString, pool, resource = db.SetuMySql(testDbConfig)
+	connString, pool, resource = db.SetupDatbase(testDbConfig)
 	var err error
-	sqlDb, err = db.Init(*connString)
+	sqlDb, err = db.InitDatabase(*connString)
 	if err != nil {
 		return
 	}

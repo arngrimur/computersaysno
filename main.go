@@ -23,9 +23,9 @@ func main() {
 			RestartPolicy: "always",
 		},
 	}
-	connString, pool, resource := db.SetuMySql(dbConfig)
-	defer db.Purge(pool,resource)
-	database, connectionError := db.Init(*connString)
+	connString, pool, resource := db.SetupDatbase(dbConfig)
+	defer db.Purge(pool, resource)
+	database, connectionError := db.InitDatabase(*connString)
 	if connectionError != nil {
 		return
 	}
