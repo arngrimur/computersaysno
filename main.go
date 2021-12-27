@@ -22,6 +22,7 @@ func main() {
 			AutoRemove:    false,
 			RestartPolicy: "always",
 		},
+		DatabaseName: "csn_db",
 	}
 	connString, pool, resource := db.SetupDatbase(dbConfig)
 	defer db.Purge(pool, resource)

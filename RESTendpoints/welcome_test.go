@@ -25,7 +25,8 @@ func TestWelcome(t *testing.T) {
 			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
-		ExpireTime: uint(240),
+		ExpireTime:   uint(240),
+		DatabaseName: "csn_db",
 	}
 	var connString, pool, resource = db.SetupDatbase(testDbConfig)
 	defer db.Purge(pool, resource)

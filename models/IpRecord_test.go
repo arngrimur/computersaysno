@@ -31,7 +31,8 @@ func TestMain(m *testing.M) {
 			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
-		ExpireTime: uint(240),
+		ExpireTime:   uint(240),
+		DatabaseName: "csn_db",
 	}
 	connString, pool, resource = db.SetupDatbase(testDbConfig)
 	var err error
