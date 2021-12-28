@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 			DatabasePassword: "testpassword",
 		},
 		HostConfig: db.HostConfig{
-			AutoRemove:    false,
+			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
 		ExpireTime:   uint(120),

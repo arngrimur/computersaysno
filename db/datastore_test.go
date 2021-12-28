@@ -25,7 +25,7 @@ func TestInit(t *testing.T) {
 	t.Cleanup(func() {
 		Purge(pool, resource)
 	})
-	assert.Equal(t, "postgres://testuser:testpassword@0.0.0.0:"+port+"/"+testDbConfig.DatabaseName+"?sslmode=disable", *connectionString)
+	assert.Regexp(t, "postgres://testuser:testpassword@(\\d{1-3}\\.){4}:"+port+"/"+testDbConfig.DatabaseName+"?sslmode=disable", *connectionString)
 	db, initErr := InitDatabase(*connectionString)
 	require.NoError(t, initErr, "Could not init the database")
 	dbErr := db.Ping()
