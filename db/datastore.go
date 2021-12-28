@@ -70,7 +70,6 @@ func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Res
 	resource.Expire(dbConfig.ExpireTime) // Tell docker to hard kill the container
 
 	connectionsString = buildConnectionString(&dbConfig, resource)
-	log.Printf("Connections string: %s", connectionsString)
 	pool.MaxWait = time.Duration(dbConfig.ExpireTime) * time.Second
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	waitForConnection(err, pool, connectionsString)
