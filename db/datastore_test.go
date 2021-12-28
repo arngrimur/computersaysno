@@ -21,11 +21,10 @@ func TestInit(t *testing.T) {
 	}
 	connectionString, pool, resource := SetupDatbase(testDbConfig)
 
-	port := resource.GetPort("5432/tcp")
 	t.Cleanup(func() {
 		Purge(pool, resource)
 	})
-	assert.Regexp(t, "^postgres://testuser:testpassword@((\\d){1,3}\\.){3}\\d{1,3}:"+port+"\\/"+testDbConfig.DatabaseName+"\\?sslmode=disable$", *connectionString)
+	assert.Regexp(t, "^postgres://testuser:testpassword@((\\d){1,3}\\.){3}\\d{1,3}:?(\\d){0,5}\\/"+testDbConfig.DatabaseName+"\\?sslmode=disable$", *connectionString)
 	db, initErr := InitDatabase(*connectionString)
 	require.NoError(t, initErr, "Could not init the database")
 	dbErr := db.Ping()
