@@ -14,9 +14,8 @@ type environment struct {
 func main() {
 	dbConfig := db.DbConfig{
 		DbSecrets: db.DbSecrets{
-			RootPassword: "secret",
-			MysqlUser:    "testuser",
-			MysqlPwd:     "testpassword",
+			DatabaseUser:     "testuser",
+			DatabasePassword: "testpassword",
 		},
 		HostConfig: db.HostConfig{
 			AutoRemove:    false,

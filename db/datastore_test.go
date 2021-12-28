@@ -9,22 +9,23 @@ import (
 func TestInit(t *testing.T) {
 	var testDbConfig = DbConfig{
 		DbSecrets: DbSecrets{
-			RootPassword: "secret",
-			MysqlUser:    "testuser",
-			MysqlPwd:     "testpassword",
+			DatabaseUser:     "testuser",
+			DatabasePassword: "testpassword",
 		},
 		HostConfig: HostConfig{
-			AutoRemove:    false,
+			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
-		ExpireTime:   uint(240),
+		ExpireTime:   uint(120),
 		DatabaseName: "csn_db",
 	}
 	connectionString, pool, resource := SetupDatbase(testDbConfig)
 
-	port := resource.GetPort("3306/tcp")
-	assert.Equal(t, "testuser:testpassword@(localhost:"+port+")/"+testDbConfig.DatabaseName+"?parseTime=true", *connectionString)
-	defer Purge(pool, resource)
+	port := resource.GetPort("5432/tcp")
+	t.Cleanup(func() {
+		Purge(pool, resource)
+	})
+	assert.Equal(t, "postgres://testuser:testpassword@0.0.0.0:"+port+"/"+testDbConfig.DatabaseName+"?sslmode=disable", *connectionString)
 	db, initErr := InitDatabase(*connectionString)
 	require.NoError(t, initErr, "Could not init the database")
 	dbErr := db.Ping()

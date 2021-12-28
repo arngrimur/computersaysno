@@ -23,15 +23,14 @@ var lookFor = IpRecord{
 func TestMain(m *testing.M) {
 	var testDbConfig = db.DbConfig{
 		DbSecrets: db.DbSecrets{
-			RootPassword: "secret",
-			MysqlUser:    "testuser",
-			MysqlPwd:     "testpassword",
+			DatabaseUser:     "testuser",
+			DatabasePassword: "testpassword",
 		},
 		HostConfig: db.HostConfig{
-			AutoRemove:    true,
+			AutoRemove:    false,
 			RestartPolicy: "no",
 		},
-		ExpireTime:   uint(240),
+		ExpireTime:   uint(120),
 		DatabaseName: "csn_db",
 	}
 	connString, pool, resource = db.SetupDatbase(testDbConfig)

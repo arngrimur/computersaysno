@@ -17,15 +17,14 @@ func TestWelcome(t *testing.T) {
 	}
 	var testDbConfig = db.DbConfig{
 		DbSecrets: db.DbSecrets{
-			RootPassword: "secret",
-			MysqlUser:    "testuser",
-			MysqlPwd:     "testpassword",
+			DatabaseUser:     "testuser",
+			DatabasePassword: "testpassword",
 		},
 		HostConfig: db.HostConfig{
 			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
-		ExpireTime:   uint(240),
+		ExpireTime:   uint(5000),
 		DatabaseName: "csn_db",
 	}
 	var connString, pool, resource = db.SetupDatbase(testDbConfig)

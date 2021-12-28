@@ -2,13 +2,15 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
-	"os"
+	"net"
+	"net/url"
+	"path/filepath"
+	"runtime"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"log"
 )
 
@@ -20,9 +22,8 @@ type Crud interface {
 }
 
 type DbSecrets struct {
-	RootPassword string
-	MysqlUser    string
-	MysqlPwd     string
+	DatabaseUser     string
+	DatabasePassword string
 }
 type HostConfig struct {
 	AutoRemove    bool
@@ -37,8 +38,10 @@ type DbConfig struct {
 }
 
 var db *sql.DB
+var connectionsString string
 
 func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Resource) {
+
 	pool, err := dockertest.NewPool("")
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	// pulls an image, creates a container based on it and runs it
@@ -46,18 +49,17 @@ func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Res
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
-	wd, _ := os.Getwd()
+	_, b, _, _ := runtime.Caller(0)
+	workingDir := filepath.Dir(b)
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "mysql",
-		Tag:        "8.0.27",
+		Repository: "postgres",
+		Tag:        "14.1",
 		Env: []string{
-			"MYSQL_ROOT_PASSWORD=" + dbConfig.DbSecrets.RootPassword,
-			"MYSQL_USER=" + dbConfig.DbSecrets.MysqlUser,
-			"MYSQL_PASSWORD=" + dbConfig.DbSecrets.MysqlPwd,
-			"MYSQL_DATABASE=" + dbConfig.DatabaseName,
+			"POSTGRES_USER=" + dbConfig.DbSecrets.DatabaseUser,
+			"POSTGRES_PASSWORD=" + dbConfig.DbSecrets.DatabasePassword,
+			"POSTGRES_DB=" + dbConfig.DatabaseName,
 		},
-		Mounts: []string{wd + "/mounts:/docker-entrypoint-initdb.d"},
-		// set AutoRemove to true so that stopped container goes away by itself
+		Mounts: []string{workingDir + "/mounts:/docker-entrypoint-initdb.d"},
 	}, func(config *docker.HostConfig) {
 		config.AutoRemove = dbConfig.HostConfig.AutoRemove
 		config.RestartPolicy = docker.RestartPolicy{Name: dbConfig.HostConfig.RestartPolicy}
@@ -66,21 +68,43 @@ func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Res
 		log.Fatalf("Could not start resource: %s", err)
 	}
 	resource.Expire(dbConfig.ExpireTime) // Tell docker to hard kill the container
-	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
-	connectionsString := fmt.Sprintf(dbConfig.DbSecrets.MysqlUser+":"+dbConfig.DbSecrets.MysqlPwd+"@(localhost:%s)/csn_db?parseTime=true", resource.GetPort("3306/tcp"))
-	log.Printf("Connections string: %s", connectionsString)
 
-	if err = pool.Retry(func() error {
-		db, err = sql.Open("mysql", connectionsString)
-		if err != nil {
-			return err
-		}
-		time.Sleep(30 * time.Second)
-		return db.Ping()
-	}); err != nil {
+	connectionsString = buildConnectionString(&dbConfig, resource)
+	log.Printf("Connections string: %s", connectionsString)
+	pool.MaxWait = time.Duration(dbConfig.ExpireTime) * time.Second
+	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
+	waitForConnection(err, pool, connectionsString)
+	return &connectionsString, pool, resource
+}
+
+func buildConnectionString(dbConfig *DbConfig, resource *dockertest.Resource) string {
+	pgUrl := &url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(dbConfig.DbSecrets.DatabaseUser, dbConfig.DbSecrets.DatabasePassword),
+		Path:   dbConfig.DatabaseName,
+	}
+	q := pgUrl.Query()
+	q.Add("sslmode", "disable")
+	pgUrl.RawQuery = q.Encode()
+
+	pgUrl.Host = resource.Container.NetworkSettings.IPAddress
+	// Docker layer network is different on Mac
+	if runtime.GOOS == "darwin" {
+		pgUrl.Host = net.JoinHostPort(resource.GetBoundIP("5432/tcp"), resource.GetPort("5432/tcp"))
+	}
+	return pgUrl.String()
+}
+func waitForConnection(err error, pool *dockertest.Pool, connectionsString string) {
+	if err = pool.Retry(wait); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
-	return &connectionsString, pool, resource
+}
+func wait() error {
+	db, err := sql.Open("postgres", connectionsString)
+	if err != nil {
+		return err
+	}
+	return db.Ping()
 }
 
 func Purge(pool *dockertest.Pool, resource *dockertest.Resource) {
@@ -90,7 +114,7 @@ func Purge(pool *dockertest.Pool, resource *dockertest.Resource) {
 }
 
 func InitDatabase(connectionString string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", connectionString)
+	db, err := sql.Open("postgres", connectionString)
 	db.SetMaxIdleConns(0)
 	if err != nil {
 		log.Fatal("Could not create database!", err)
