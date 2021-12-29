@@ -1,7 +1,7 @@
 package RESTendpoints
 
 import (
-	"csn/db"
+	"csn/database_test_helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -15,21 +15,21 @@ func TestWelcome(t *testing.T) {
 		m      WelcomeModel
 		status int
 	}
-	var testDbConfig = db.DbConfig{
-		DbSecrets: db.DbSecrets{
+	var testDbConfig = database_test_helper.DbConfig{
+		DbSecrets: database_test_helper.DbSecrets{
 			DatabaseUser:     "testuser",
 			DatabasePassword: "testpassword",
 		},
-		HostConfig: db.HostConfig{
+		HostConfig: database_test_helper.HostConfig{
 			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
 		ExpireTime:   uint(5000),
 		DatabaseName: "csn_db",
 	}
-	var connString, pool, resource = db.SetupDatbase(testDbConfig)
-	defer db.Purge(pool, resource)
-	var sqlDb, err = db.InitDatabase(*connString)
+	var connString, pool, resource = database_test_helper.SetupDatbase(testDbConfig)
+	defer database_test_helper.Purge(pool, resource)
+	var sqlDb, err = database_test_helper.InitDatabase(*connString)
 	require.NoError(t, err, "Could not set up database")
 
 	tests := []struct {

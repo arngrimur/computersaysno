@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS hits (ip varchar(15) PRIMARY KEY , hit_count smallint);

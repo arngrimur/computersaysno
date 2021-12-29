@@ -6,6 +6,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/ory/dockertest/v3 v3.8.1
 	github.com/stretchr/testify v1.7.0
+	github.com/golang-migrate/migrate/v4 v4.15.1
 )
 
 

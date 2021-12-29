@@ -4,4 +4,4 @@ services:
   mysql:
     image: mysql:8.0.27
     volumes:
-      - ./db/:/root/db/
+      - ./database_test_helper/:/root/database_test_helper/
