@@ -1,7 +1,7 @@
 package models
 
 import (
-	"csn/db"
+	"csn/database_test_helper"
 	"database/sql"
 	"github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/assert"
@@ -21,26 +21,26 @@ var lookFor = IpRecord{
 }
 
 func TestMain(m *testing.M) {
-	var testDbConfig = db.DbConfig{
-		DbSecrets: db.DbSecrets{
+	var testDbConfig = database_test_helper.DbConfig{
+		DbSecrets: database_test_helper.DbSecrets{
 			DatabaseUser:     "testuser",
 			DatabasePassword: "testpassword",
 		},
-		HostConfig: db.HostConfig{
+		HostConfig: database_test_helper.HostConfig{
 			AutoRemove:    true,
 			RestartPolicy: "no",
 		},
 		ExpireTime:   uint(120),
 		DatabaseName: "csn_db",
 	}
-	connString, pool, resource = db.SetupDatbase(testDbConfig)
+	connString, pool, resource = database_test_helper.SetupDatbase(testDbConfig)
 	var err error
-	sqlDb, err = db.InitDatabase(*connString)
+	sqlDb, err = database_test_helper.InitDatabase(*connString)
 	if err != nil {
 		return
 	}
 	exitVal := m.Run()
-	db.Purge(pool, resource)
+	database_test_helper.Purge(pool, resource)
 	os.Exit(exitVal)
 }
 

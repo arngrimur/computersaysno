@@ -1,4 +1,4 @@
-package db
+package database_test_helper
 
 import (
 	"database/sql"

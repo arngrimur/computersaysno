@@ -12,20 +12,7 @@ type environment struct {
 }
 
 func main() {
-	dbConfig := db.DbConfig{
-		DbSecrets: db.DbSecrets{
-			DatabaseUser:     "testuser",
-			DatabasePassword: "testpassword",
-		},
-		HostConfig: db.HostConfig{
-			AutoRemove:    false,
-			RestartPolicy: "always",
-		},
-		DatabaseName: "csn_db",
-	}
-	connString, pool, resource := db.SetupDatbase(dbConfig)
-	defer db.Purge(pool, resource)
-	database, connectionError := db.InitDatabase(*connString)
+	database, connectionError := db.InitDatabase()
 	if connectionError != nil {
 		return
 	}
