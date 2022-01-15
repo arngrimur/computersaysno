@@ -7,7 +7,6 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/ory/dockertest/v3 v3.8.1
 	github.com/stretchr/testify v1.7.0
-
 )
 
 require (
@@ -45,3 +44,5 @@ require (
 )
 
 replace golang.org/x/net => golang.org/x/net v0.0.0-20210520170846-37e1c6afe023
+
+replace github.com/containerd/continuity v0.1.0 => github.com/containerd/continuity v0.2.0
