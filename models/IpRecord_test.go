@@ -21,7 +21,6 @@ var lookFor = IpRecord{
 }
 
 func TestMain(m *testing.M) {
-
 	connString, pool, resource = database_test_helper.SetupDatbase()
 	var err error
 	sqlDb, err = database_test_helper.InitDatabase(*connString)
