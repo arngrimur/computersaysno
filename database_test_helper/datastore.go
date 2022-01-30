@@ -39,13 +39,25 @@ type DbConfig struct {
 
 var db *sql.DB
 var connectionsString string
+var TestDbConfig = DbConfig{
+	DbSecrets: DbSecrets{
+		DatabaseUser:     "testuser",
+		DatabasePassword: "testpassword",
+	},
+	HostConfig: HostConfig{
+		AutoRemove:    true,
+		RestartPolicy: "no",
+	},
+	ExpireTime:   uint(120),
+	DatabaseName: "csn_db",
+}
 
-func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Resource) {
+func SetupDatbase() (*string, *dockertest.Pool, *dockertest.Resource) {
 
 	pool, err := dockertest.NewPool("")
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	// pulls an image, creates a container based on it and runs it
-	pool.MaxWait = time.Duration(dbConfig.ExpireTime) * time.Second
+	pool.MaxWait = time.Duration(TestDbConfig.ExpireTime) * time.Second
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
@@ -55,22 +67,22 @@ func SetupDatbase(dbConfig DbConfig) (*string, *dockertest.Pool, *dockertest.Res
 		Repository: "postgres",
 		Tag:        "14.1",
 		Env: []string{
-			"POSTGRES_USER=" + dbConfig.DbSecrets.DatabaseUser,
-			"POSTGRES_PASSWORD=" + dbConfig.DbSecrets.DatabasePassword,
-			"POSTGRES_DB=" + dbConfig.DatabaseName,
+			"POSTGRES_USER=" + TestDbConfig.DbSecrets.DatabaseUser,
+			"POSTGRES_PASSWORD=" + TestDbConfig.DbSecrets.DatabasePassword,
+			"POSTGRES_DB=" + TestDbConfig.DatabaseName,
 		},
 		Mounts: []string{workingDir + "/mounts:/docker-entrypoint-initdb.d"},
 	}, func(config *docker.HostConfig) {
-		config.AutoRemove = dbConfig.HostConfig.AutoRemove
-		config.RestartPolicy = docker.RestartPolicy{Name: dbConfig.HostConfig.RestartPolicy}
+		config.AutoRemove = TestDbConfig.HostConfig.AutoRemove
+		config.RestartPolicy = docker.RestartPolicy{Name: TestDbConfig.HostConfig.RestartPolicy}
 	})
 	if err != nil {
 		log.Fatalf("Could not start resource: %s", err)
 	}
-	resource.Expire(dbConfig.ExpireTime) // Tell docker to hard kill the container
+	resource.Expire(TestDbConfig.ExpireTime) // Tell docker to hard kill the container
 
-	connectionsString = buildConnectionString(&dbConfig, resource)
-	pool.MaxWait = time.Duration(dbConfig.ExpireTime) * time.Second
+	connectionsString = buildConnectionString(&TestDbConfig, resource)
+	pool.MaxWait = time.Duration(TestDbConfig.ExpireTime) * time.Second
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	waitForConnection(err, pool, connectionsString)
 	return &connectionsString, pool, resource

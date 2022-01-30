@@ -15,19 +15,8 @@ func TestWelcome(t *testing.T) {
 		m      WelcomeModel
 		status int
 	}
-	var testDbConfig = database_test_helper.DbConfig{
-		DbSecrets: database_test_helper.DbSecrets{
-			DatabaseUser:     "testuser",
-			DatabasePassword: "testpassword",
-		},
-		HostConfig: database_test_helper.HostConfig{
-			AutoRemove:    true,
-			RestartPolicy: "no",
-		},
-		ExpireTime:   uint(5000),
-		DatabaseName: "csn_db",
-	}
-	var connString, pool, resource = database_test_helper.SetupDatbase(testDbConfig)
+
+	var connString, pool, resource = database_test_helper.SetupDatbase()
 	defer database_test_helper.Purge(pool, resource)
 	var sqlDb, err = database_test_helper.InitDatabase(*connString)
 	require.NoError(t, err, "Could not set up database")
@@ -40,7 +29,7 @@ func TestWelcome(t *testing.T) {
 		{"Second time is ok", args{getRequest(t, "GET", "/", "127.0.0.1"), WelcomeModel{DB: sqlDb}, http.StatusOK}},
 		{"Third time is forbidden", args{getRequest(t, "GET", "/", "127.0.0.1"), WelcomeModel{DB: sqlDb}, http.StatusForbidden}},
 		{"Keep rejecting", args{getRequest(t, "GET", "/", "127.0.0.1"), WelcomeModel{DB: sqlDb}, http.StatusForbidden}},
-		{"New IP is alllowed", args{getRequest(t, "GET", "/", "10.0.0.10"), WelcomeModel{DB: sqlDb}, http.StatusOK}},
+		{"New IP is allowed", args{getRequest(t, "GET", "/", "10.0.0.10"), WelcomeModel{DB: sqlDb}, http.StatusOK}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

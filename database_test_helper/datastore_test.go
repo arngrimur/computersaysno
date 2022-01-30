@@ -7,24 +7,13 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	var testDbConfig = DbConfig{
-		DbSecrets: DbSecrets{
-			DatabaseUser:     "testuser",
-			DatabasePassword: "testpassword",
-		},
-		HostConfig: HostConfig{
-			AutoRemove:    true,
-			RestartPolicy: "no",
-		},
-		ExpireTime:   uint(120),
-		DatabaseName: "csn_db",
-	}
-	connectionString, pool, resource := SetupDatbase(testDbConfig)
+
+	connectionString, pool, resource := SetupDatbase()
 
 	t.Cleanup(func() {
 		Purge(pool, resource)
 	})
-	assert.Regexp(t, "^postgres://testuser:testpassword@((\\d){1,3}\\.){3}\\d{1,3}:?(\\d){0,5}\\/"+testDbConfig.DatabaseName+"\\?sslmode=disable$", *connectionString)
+	assert.Regexp(t, "^postgres://testuser:testpassword@((\\d){1,3}\\.){3}\\d{1,3}:?(\\d){0,5}\\/"+TestDbConfig.DatabaseName+"\\?sslmode=disable$", *connectionString)
 	db, initErr := InitDatabase(*connectionString)
 	require.NoError(t, initErr, "Could not init the database")
 	dbErr := db.Ping()
