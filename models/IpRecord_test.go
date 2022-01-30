@@ -21,19 +21,8 @@ var lookFor = IpRecord{
 }
 
 func TestMain(m *testing.M) {
-	var testDbConfig = database_test_helper.DbConfig{
-		DbSecrets: database_test_helper.DbSecrets{
-			DatabaseUser:     "testuser",
-			DatabasePassword: "testpassword",
-		},
-		HostConfig: database_test_helper.HostConfig{
-			AutoRemove:    true,
-			RestartPolicy: "no",
-		},
-		ExpireTime:   uint(120),
-		DatabaseName: "csn_db",
-	}
-	connString, pool, resource = database_test_helper.SetupDatbase(testDbConfig)
+
+	connString, pool, resource = database_test_helper.SetupDatbase()
 	var err error
 	sqlDb, err = database_test_helper.InitDatabase(*connString)
 	if err != nil {

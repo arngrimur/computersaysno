@@ -15,19 +15,8 @@ func TestWelcome(t *testing.T) {
 		m      WelcomeModel
 		status int
 	}
-	var testDbConfig = database_test_helper.DbConfig{
-		DbSecrets: database_test_helper.DbSecrets{
-			DatabaseUser:     "testuser",
-			DatabasePassword: "testpassword",
-		},
-		HostConfig: database_test_helper.HostConfig{
-			AutoRemove:    true,
-			RestartPolicy: "no",
-		},
-		ExpireTime:   uint(5000),
-		DatabaseName: "csn_db",
-	}
-	var connString, pool, resource = database_test_helper.SetupDatbase(testDbConfig)
+
+	var connString, pool, resource = database_test_helper.SetupDatbase()
 	defer database_test_helper.Purge(pool, resource)
 	var sqlDb, err = database_test_helper.InitDatabase(*connString)
 	require.NoError(t, err, "Could not set up database")
