@@ -12,15 +12,12 @@ type WelcomeModel struct {
 	DB *sql.DB
 }
 
-//var lookUpMap = make(map[string]*models.IpRecord)
-
 func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		ip = r.RemoteAddr
 	}
-	//ipEntry, ipEntryExist := lookUpMap[ip]
 	findIpRecord := models.NewIpRecord(ip)
 	readIpRecord, err := findIpRecord.Read(welcome.DB)
 	if err != nil {
@@ -31,15 +28,6 @@ func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 		readIpRecord.Update(welcome.DB)
 		generateOutput(w, readIpRecord)
 	}
-
-	//if ipEntryExist {
-	//	ipEntry.IncreaseHitCount()
-	//	generateOutput(w, ipEntry)
-	//} else {
-	//	lookUpMap[ip] = models.NewIpRecord(ip)
-	//	//save(lookUpMap[ip])
-	//	generateOutput(w, lookUpMap[ip])
-	//}
 }
 
 func generateOutput(w http.ResponseWriter, entry *models.IpRecord) {
@@ -57,4 +45,5 @@ func generateOutput(w http.ResponseWriter, entry *models.IpRecord) {
 		_, _ = fmt.Fprintf(w, "The computer says NO!!!")
 		break
 	}
+
 }

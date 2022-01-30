@@ -42,7 +42,10 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
-
-replace golang.org/x/net => golang.org/x/net v0.0.0-20210520170846-37e1c6afe023
-
-replace github.com/containerd/continuity v0.1.0 => github.com/containerd/continuity v0.2.0
+replace (
+	golang.org/x/net => golang.org/x/net v0.0.0-20210520170846-37e1c6afe023
+	github.com/containerd/continuity v0.1.0 => github.com/containerd/continuity v0.2.0
+	//csn/db  => ./db
+	//csn/models => ./models
+	//csn/RESTendpoints => ./RESTendpoints
+)

@@ -40,7 +40,7 @@ func TestWelcome(t *testing.T) {
 		{"Second time is ok", args{getRequest(t, "GET", "/", "127.0.0.1"), WelcomeModel{DB: sqlDb}, http.StatusOK}},
 		{"Third time is forbidden", args{getRequest(t, "GET", "/", "127.0.0.1"), WelcomeModel{DB: sqlDb}, http.StatusForbidden}},
 		{"Keep rejecting", args{getRequest(t, "GET", "/", "127.0.0.1"), WelcomeModel{DB: sqlDb}, http.StatusForbidden}},
-		{"New IP is alllowed", args{getRequest(t, "GET", "/", "10.0.0.10"), WelcomeModel{DB: sqlDb}, http.StatusOK}},
+		{"New IP is allowed", args{getRequest(t, "GET", "/", "10.0.0.10"), WelcomeModel{DB: sqlDb}, http.StatusOK}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

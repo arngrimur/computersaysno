@@ -18,7 +18,7 @@ func InitDatabase() (*sql.DB, error) {
 	}
 	driver, driverErr := postgres.WithInstance(db, &postgres.Config{})
 	if driverErr != nil {
-		log.Fatalf("Can insatnciate database")
+		log.Fatalf("Can not instanciate database")
 		return nil, driverErr
 	}
 	m, migrateErr := migrate.NewWithDatabaseInstance(
@@ -36,5 +36,6 @@ func InitDatabase() (*sql.DB, error) {
 }
 
 func createConnectionString() string {
-	panic("Implement me!!! Grab from kubenetes secets")
+	log.Fatalf("Implement me!!! Grab from kubenetes secets")
+	return "jdbc:postgresql://localhost:55144/csn_db?sslmode=disable"
 }
