@@ -37,7 +37,8 @@ COPY --from=build /csn /csn
 COPY --from=build /etc/passwd /etc/passwd
 COPY --from=build /etc/group /etc/group
 
-EXPOSE 443
+#Expose port higher that 1000 so we don't need any priveleges
+EXPOSE 10443
 
 USER nonroot:nonroot
 
