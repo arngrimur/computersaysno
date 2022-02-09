@@ -21,11 +21,17 @@ func (welcome *WelcomeModel) Welcome(w http.ResponseWriter, r *http.Request) {
 	findIpRecord := models.NewIpRecord(ip)
 	readIpRecord, err := findIpRecord.Read(welcome.DB)
 	if err != nil {
-		findIpRecord.Create(welcome.DB)
+		_, err := findIpRecord.Create(welcome.DB)
+		if err != nil {
+			return
+		}
 		generateOutput(w, findIpRecord)
 	} else {
 		readIpRecord.IncreaseHitCount()
-		readIpRecord.Update(welcome.DB)
+		_, err := readIpRecord.Update(welcome.DB)
+		if err != nil {
+			return
+		}
 		generateOutput(w, readIpRecord)
 	}
 }
