@@ -41,15 +41,12 @@ func generateOutput(w http.ResponseWriter, entry *models.IpRecord) {
 	case uint8(1):
 		w.WriteHeader(http.StatusOK)
 		_, _ = fmt.Fprintf(w, "Welcome, your IP is %s!", entry.GetIp())
-		break
 	case uint8(2):
 		w.WriteHeader(http.StatusOK)
 		_, _ = fmt.Fprintf(w, "Yeah, I know your IP is %s!", entry.GetIp())
-		break
 	default:
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = fmt.Fprintf(w, "The computer says NO!!!")
-		break
 	}
 
 }
