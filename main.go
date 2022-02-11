@@ -7,9 +7,11 @@ import (
 	"net/http"
 )
 
-type environment struct {
-	welcome RESTendpoints.WelcomeModel
-}
+type (
+	environment struct {
+		welcome RESTendpoints.WelcomeModel
+	}
+)
 
 func main() {
 	database, connectionError := db.InitDatabase()

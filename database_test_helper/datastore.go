@@ -83,7 +83,7 @@ func SetupDatbase() (*string, *dockertest.Pool, *dockertest.Resource) {
 	connectionsString = buildConnectionString(&TestDbConfig, resource)
 	pool.MaxWait = time.Duration(TestDbConfig.ExpireTime) * time.Second
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
-	waitForConnection(err, pool)
+	waitForConnection(pool)
 	return &connectionsString, pool, resource
 }
 
@@ -104,8 +104,8 @@ func buildConnectionString(dbConfig *DbConfig, resource *dockertest.Resource) st
 	}
 	return pgUrl.String()
 }
-func waitForConnection(err error, pool *dockertest.Pool) {
-	if err = pool.Retry(wait); err != nil {
+func waitForConnection(pool *dockertest.Pool) {
+	if err := pool.Retry(wait); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 }
