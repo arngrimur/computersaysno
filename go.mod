@@ -14,6 +14,7 @@ require (
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
+	github.com/containerd/containerd v1.5.7 // indirect
 	github.com/containerd/continuity v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/cli v20.10.11+incompatible // indirect
@@ -42,10 +43,11 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
+
 replace (
-	golang.org/x/net => golang.org/x/net v0.0.0-20210520170846-37e1c6afe023
 	github.com/containerd/continuity v0.1.0 => github.com/containerd/continuity v0.2.0
-	//csn/db  => ./db
-	//csn/models => ./models
-	//csn/RESTendpoints => ./RESTendpoints
+	golang.org/x/net => golang.org/x/net v0.0.0-20210520170846-37e1c6afe023
+//csn/db  => ./db
+//csn/models => ./models
+//csn/RESTendpoints => ./RESTendpoints
 )
