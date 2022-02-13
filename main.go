@@ -7,9 +7,11 @@ import (
 	"net/http"
 )
 
-type environment struct {
-	welcome RESTendpoints.WelcomeModel
-}
+type (
+	Environment struct {
+		Welcome RESTendpoints.WelcomeModel
+	}
+)
 
 func main() {
 	database, connectionError := db.InitDatabase()
@@ -17,12 +19,12 @@ func main() {
 		return
 	}
 
-	env := &environment{welcome: RESTendpoints.WelcomeModel{
+	env := &Environment{Welcome: RESTendpoints.WelcomeModel{
 		DB: database,
 	}}
 
 	http.HandleFunc("/info", RESTendpoints.Info)
-	http.HandleFunc("/", env.welcome.Welcome)
+	http.HandleFunc("/", env.Welcome.Welcome)
 	err := http.ListenAndServe(":443", nil)
 	if err != nil {
 		log.Fatal("Unable to start web server!", err)

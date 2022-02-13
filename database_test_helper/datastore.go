@@ -37,7 +37,6 @@ type DbConfig struct {
 	DatabaseName string
 }
 
-var db *sql.DB
 var connectionsString string
 var TestDbConfig = DbConfig{
 	DbSecrets: DbSecrets{
@@ -79,12 +78,12 @@ func SetupDatbase() (*string, *dockertest.Pool, *dockertest.Resource) {
 	if err != nil {
 		log.Fatalf("Could not start resource: %s", err)
 	}
-	resource.Expire(TestDbConfig.ExpireTime) // Tell docker to hard kill the container
+	_ = resource.Expire(TestDbConfig.ExpireTime) // Tell docker to hard kill the container
 
 	connectionsString = buildConnectionString(&TestDbConfig, resource)
 	pool.MaxWait = time.Duration(TestDbConfig.ExpireTime) * time.Second
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
-	waitForConnection(err, pool, connectionsString)
+	waitForConnection(pool)
 	return &connectionsString, pool, resource
 }
 
@@ -105,8 +104,8 @@ func buildConnectionString(dbConfig *DbConfig, resource *dockertest.Resource) st
 	}
 	return pgUrl.String()
 }
-func waitForConnection(err error, pool *dockertest.Pool, connectionsString string) {
-	if err = pool.Retry(wait); err != nil {
+func waitForConnection(pool *dockertest.Pool) {
+	if err := pool.Retry(wait); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 }

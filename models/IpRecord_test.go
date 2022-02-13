@@ -112,3 +112,9 @@ func TestIpRecord_Delete(t *testing.T) {
 	_, err2 := lookFor.Read(sqlDb)
 	require.Error(t, err2, "No IpRecord shall exist!")
 }
+
+func TestSetMaxHitCount(t *testing.T) {
+	record := NewIpRecord(ip)
+	record.SetMaxHitCount()
+	assert.Equal(t, MaxHitCount, record.hitCount)
+}
