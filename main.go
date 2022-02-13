@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	environment struct {
+	Environment struct {
 		welcome RESTendpoints.WelcomeModel
 	}
 )
@@ -19,7 +19,7 @@ func main() {
 		return
 	}
 
-	env := &environment{welcome: RESTendpoints.WelcomeModel{
+	env := &Environment{welcome: RESTendpoints.WelcomeModel{
 		DB: database,
 	}}
 
