@@ -2,11 +2,13 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"log"
+	"os"
 )
 
 func InitDatabase() (*sql.DB, error) {
@@ -36,6 +38,13 @@ func InitDatabase() (*sql.DB, error) {
 }
 
 func createConnectionString() string {
-	log.Fatalf("Implement me!!! Grab from kubenetes secets")
-	return "jdbc:postgresql://localhost:55144/csn_db?sslmode=disable"
+	username, err := os.ReadFile("/tmp/db/username")
+	if err != nil {
+		log.Fatalf("Can not read database username. Error is: %s", err.Error())
+	}
+	password, err := os.ReadFile("/tmp/db/password")
+	if err != nil {
+		log.Fatalf("Can not read database password. Error is: %s", err.Error())
+	}
+	return fmt.Sprintf("jdbc:postgresql://%s:%s@localhost:55144/csn_db?sslmode=disable", username, password)
 }
