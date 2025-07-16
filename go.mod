@@ -1,6 +1,6 @@
 module computersaysno
 
-go 1.24.1
+go 1.24.5
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.15.1
